@@ -3,8 +3,9 @@ from . import views
 
 
 urlpatterns = [
-    path('',views.starting_page, name="starting-page"),
-    path('posts',views.posts,name="posts-page"),
-    path('/<slug:slug>',views.post_detail,name="post-detail-page"),
+    path('',views.LandingPage.as_view(), name="landing-page"),
+    path('posts',views.AllPosts.as_view(),name="posts-page"),
+    path('/<slug:slug>',views.PostDetail.as_view(),name="post-detail-page"),
+    path("read-later",views.ReadLaterView.as_view(),name="read-later")
 
 ]

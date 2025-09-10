@@ -1,25 +1,107 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from datetime import date
 from django.shortcuts import get_object_or_404
+from django.views import View
+from django.views.generic import ListView ,DetailView ,TemplateView
 from . import models
+from .forms import CommentForm
 
 
 
-def starting_page(request):
-    posts = models.Post.objects.all().order_by("-date")[0:3]
-    return render(request,'blog/index.html',{
-        "posts":posts,
-    })
+class LandingPage(ListView):
+    template_name = 'blog/index.html'
+    context_object_name = 'posts'
+    model = models.Post
+    ordering = ["-date"]
+
+    def get_queryset(self):
+        query = super().get_queryset()
+        data = query[0:3]
+        return data
 
 
-def posts(request):
-    posts = models.Post.objects.all()
-    return render(request,'blog/all-posts.html',{
-        "posts":posts,
-    })
+class AllPosts(ListView):
+    template_name = 'blog/all-posts.html'
+    context_object_name = 'posts'
+    model = models.Post
 
-def post_detail(request,slug):
-    post = get_object_or_404(models.Post,slug=slug)
-    return render(request,'blog/post-detail.html',{
-        "post":post,
-    })
+
+class PostDetail(View):
+    def is_stored_post(self,request,post_id):
+        stored_posts = request.session.get('stored_posts')
+        if stored_posts is not None:
+            is_saved_for_later = post_id in stored_posts
+        else:
+            is_saved_for_later = False
+        return is_saved_for_later
+    
+    def get(self,request,slug):
+        post = models.Post.objects.get(slug=slug)
+        comments = models.Comment.objects.all().order_by("-date")
+        stored_posts = request.session.get('stored_posts')
+        if stored_posts is not None:
+            is_saved_for_later = post.id in stored_posts
+        else:
+            is_saved_for_later = False            
+        context = {
+            "post":post,
+            "post_tags":post.tags.all(),
+            "comment_form":CommentForm(),
+            "comments":comments,
+            "saved_for_later":self.is_stored_post(request,post.id)
+        }
+        return render(request,"blog/post-detail.html",context)
+    
+    
+    def post(self,request,slug):
+        form = CommentForm(request.POST)
+        post = models.Post.objects.get(slug=slug) 
+        comments = models.Comment.objects.all().order_by("-date")
+
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+            return redirect("post-detail-page",slug=slug)
+        else:
+            context = {
+            "post":post,
+            "post_tags":post.tags.all(),
+            "comment_form":form,
+            "comments":comments,
+            "saved_for_later":self.is_stored_post(request,post.id)
+        }
+            return render(request,"blog/post-detail.html",context)
+
+
+class ReadLaterView(View):
+
+    def get(self,request):
+        stored_posts = request.session.get("stored_posts")
+        context = {}
+
+        if stored_posts is None or len(stored_posts) == 0:
+            context['posts'] = []
+            context["has_posts"] = False
+        else:
+            posts = models.Post.objects.filter(id__in=stored_posts)
+            context['posts'] = posts 
+            context["has_posts"] = True
+        
+        return render(request,"blog/stored-posts.html",context)
+
+    def post(self,request):
+        stored_posts = request.session.get("stored_posts")
+
+        if stored_posts is None:
+            stored_posts = []
+        
+        post_id = int(request.POST['post_id'])
+        if post_id not in stored_posts:
+            stored_posts.append(post_id)
+        else:
+            stored_posts.remove(post_id)
+
+        request.session['stored_posts'] = stored_posts
+        return redirect("landing-page")
+
