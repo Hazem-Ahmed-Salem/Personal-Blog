@@ -23,7 +23,7 @@
         </div>
         
         <article>
-            <img src="{% static 'blog/images/Task.png' %}" alt="{{post.title}}">
+            <img src={{post.image.url}} alt="{{post.title}}">
             <address>
                 <a href="mailto:{{post.author.email}}">{{post.author}}</a>
             </address>
