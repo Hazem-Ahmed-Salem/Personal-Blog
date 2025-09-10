@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.text import slugify
-from my_site.settings import BASE_DIR
 from django.core.validators import MinLengthValidator
 
 
@@ -30,8 +29,7 @@ class Post(models.Model):
     author = models.ForeignKey(Author,on_delete=models.SET_NULL,related_name="posts",null=True)
     tags = models.ManyToManyField(Tag)
     excerpt = models.CharField(max_length=200)
-    # image_name = models.ImageField(upload_to=f"{BASE_DIR}/mdeia/post_image")
-    image_name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to="post_image/")
     date = models.DateField(auto_now=True)
     content = models.TextField(validators= [MinLengthValidator(10)])
     slug = models.SlugField(unique=True, db_index=True)
