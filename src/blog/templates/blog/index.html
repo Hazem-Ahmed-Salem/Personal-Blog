@@ -6,15 +6,15 @@
 <link rel="stylesheet" href="{% static 'blog/css/index.css' %}">
 {% endblock %}
 
-{% block title %} My Blog {% endblock %}
+{% block title %} {{author.user.get_full_name}} Blog {% endblock %}
 
 {% block content %}
 <section id="welcome">
     <header>
         <img src="{% static 'blog/images/My_image.PNG' %}" alt="Hazem - The Author of this Blog">
-        <h2>HAZEM'S BLOG</h2>
+        <h2>{{author.user.first_name|upper}}'S BLOG</h2>
     </header>
-    <p>Hi, I am Hazem and I Love to blog about the latest tech</p>
+    <p>{{author.bio}}</p>
 </section>
 
 <section id="latest-posts">
@@ -27,8 +27,11 @@
 </section>
 
 <section id="about">
-    <h2>what I do</h2>
-    <p>I love programming , i love to help others and enjoy explore new technologies</p>
-    <p>I love programming , i love to help others and enjoy explore new technologies</p>
+    <div class="about-section">
+        <h2>About Me</h2>
+        <p class="about-text">{{ author.about|linebreaks }}</p>
+        <h2>What I Do</h2>
+        <p class="about-text">{{ author.what_i_do|linebreaks }}</p>
+    </div>
 </section>
 {% endblock %}

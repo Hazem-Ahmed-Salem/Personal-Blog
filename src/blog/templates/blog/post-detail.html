@@ -22,10 +22,19 @@
         <h2>{{post.title}}</h2>
         
         <div>
+            <h4>Tags:</h4>
             {% for tag in post_tags %}
                 <span class="tag">{{tag.caption}}</span>
             {% empty %}
-                <span>No Tags</span>
+                <span class="white">No Tags</span>
+            {% endfor %}
+        </div>
+        <div>
+            <h4>Related Links:</h4>
+            {% for link in post.links.all %}
+                <a href="{{link.link}}" target="_blank"><span class="tag">{{link.title}}</span></a>
+            {% empty %}
+                <span class="white">No Related Links</span>
             {% endfor %}
         </div>
         <div id="read-later">

@@ -12,17 +12,19 @@ class Tag(models.Model):
     
 
 class Author(models.Model):
-    first_name = models.CharField(max_length=100) 
-    last_name = models.CharField(max_length=100) 
-    email = models.EmailField() 
-
-    @property
-    def full_name(self):
-        return f"{self.first_name} {self.last_name}"
-    
+    user  = models.OneToOneField("auth.User",null=True, on_delete=models.CASCADE,related_name="author")
+    bio   = models.CharField(null=True,max_length=200) 
+    about = models.TextField(null=True,)
+    what_i_do = models.TextField(null=True,max_length=300) 
     def __str__(self):
-        return self.full_name
+        return self.user.get_full_name()
 
+class Link(models.Model):
+    name = models.CharField(max_length=100)
+    title = models.CharField(null=True,max_length=50)
+    link = models.URLField()
+    def __str__(self):
+        return self.name
 
 class Post(models.Model):
     title = models.CharField(max_length=150)
@@ -33,6 +35,7 @@ class Post(models.Model):
     date = models.DateField(auto_now=True)
     content = models.TextField(validators= [MinLengthValidator(10)])
     slug = models.SlugField(unique=True, db_index=True)
+    links = models.ManyToManyField(Link,null=True,blank=True,related_name='links') 
 
     def __str__(self):
         return f"{self.title}, {self.author}"
@@ -47,3 +50,4 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.email}: {self.text[:] if (len(self.text) <= 20) else self.text[:20]+" ...."}"
+    

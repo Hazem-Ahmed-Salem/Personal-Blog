@@ -1,11 +1,10 @@
 from django.shortcuts import render,redirect
-from datetime import date
-from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
 from django.views import View
-from django.views.generic import ListView ,DetailView ,TemplateView
+from django.views.generic import ListView 
 from . import models
 from .forms import CommentForm
-
+from .utils import get_author
 
 
 class LandingPage(ListView):
@@ -13,7 +12,11 @@ class LandingPage(ListView):
     context_object_name = 'posts'
     model = models.Post
     ordering = ["-date"]
-
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['author'] = get_author()
+        return context
     def get_queryset(self):
         query = super().get_queryset()
         data = query[0:3]
@@ -24,6 +27,11 @@ class AllPosts(ListView):
     template_name = 'blog/all-posts.html'
     context_object_name = 'posts'
     model = models.Post
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['author'] = get_author()
+        return context
 
 
 class PostDetail(View):
@@ -48,7 +56,8 @@ class PostDetail(View):
             "post_tags":post.tags.all(),
             "comment_form":CommentForm(),
             "comments":comments,
-            "saved_for_later":self.is_stored_post(request,post.id)
+            "saved_for_later":self.is_stored_post(request,post.id),
+            'author': get_author()
         }
         return render(request,"blog/post-detail.html",context)
     
@@ -69,7 +78,8 @@ class PostDetail(View):
             "post_tags":post.tags.all(),
             "comment_form":form,
             "comments":comments,
-            "saved_for_later":self.is_stored_post(request,post.id)
+            "saved_for_later":self.is_stored_post(request,post.id),
+            'author': get_author()
         }
             return render(request,"blog/post-detail.html",context)
 
@@ -88,6 +98,7 @@ class ReadLaterView(View):
             context['posts'] = posts 
             context["has_posts"] = True
         
+        context['author'] = get_author()
         return render(request,"blog/stored-posts.html",context)
 
     def post(self,request):
@@ -103,5 +114,5 @@ class ReadLaterView(View):
             stored_posts.remove(post_id)
 
         request.session['stored_posts'] = stored_posts
-        return redirect("landing-page")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
