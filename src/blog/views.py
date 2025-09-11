@@ -45,7 +45,7 @@ class PostDetail(View):
     
     def get(self,request,slug):
         post = models.Post.objects.get(slug=slug)
-        comments = models.Comment.objects.all().order_by("-date")
+        comments = models.Comment.objects.filter(post=post).order_by("-date")
         stored_posts = request.session.get('stored_posts')
         if stored_posts is not None:
             is_saved_for_later = post.id in stored_posts
