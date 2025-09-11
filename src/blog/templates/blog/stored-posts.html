@@ -12,7 +12,8 @@ My Stored Posts
 
 {% block content %}
 <section id="stored-posts">
-{% if  has_posts %}
+    {% if  has_posts %}
+    <h1 class="page-title" style="text-align: center;">Read Later List</h1>
 <ul>
     {% for post in  posts %}
     <li>
