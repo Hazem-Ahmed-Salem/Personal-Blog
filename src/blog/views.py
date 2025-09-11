@@ -45,7 +45,7 @@ class PostDetail(View):
     
     def get(self,request,slug):
         post = models.Post.objects.get(slug=slug)
-        comments = models.Comment.objects.filter(post=post).order_by("-date")
+        comments = models.Comment.objects.filter(post=post).order_by("-date")[0:10]
         context = {
             "post":post,
             "post_tags":post.tags.all(),
@@ -60,7 +60,7 @@ class PostDetail(View):
     def post(self,request,slug):
         form = CommentForm(request.POST)
         post = models.Post.objects.get(slug=slug) 
-        comments = models.Comment.objects.all().order_by("-date")
+        comments = models.Comment.objects.all().order_by("-date")[0:10]
 
         if form.is_valid():
             comment = form.save(commit=False)
