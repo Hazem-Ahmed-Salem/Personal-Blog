@@ -23,7 +23,7 @@ Here’s how the blog looks in action:
 
 ## 🚀 Features
 
-✅ Clean and responsive UI  
+✅ Clean UI  
 ✅ Built with Django’s default user model  
 ✅ Manage posts from Django Admin (create, edit, delete)  
 ✅ Lightweight and easy to customize  
