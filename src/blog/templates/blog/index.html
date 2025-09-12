@@ -11,7 +11,7 @@
 {% block content %}
 <section id="welcome">
     <header>
-        <img src="{% static 'blog/images/My_image.PNG' %}" alt="Hazem - The Author of this Blog">
+        <img src="{{author.image.url}}" alt="Hazem - The Author of this Blog">
         <h2>{{author.user.first_name|upper}}'S BLOG</h2>
     </header>
     <p>{{author.bio}}</p>

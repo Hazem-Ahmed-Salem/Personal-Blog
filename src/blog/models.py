@@ -13,6 +13,7 @@ class Tag(models.Model):
 
 class Author(models.Model):
     user  = models.OneToOneField("auth.User",null=True, on_delete=models.CASCADE,related_name="author")
+    image = models.ImageField(upload_to="author_image/",default="Default.png")
     bio   = models.CharField(null=True,max_length=200) 
     about = models.TextField(null=True,)
     what_i_do = models.TextField(null=True,max_length=300) 
