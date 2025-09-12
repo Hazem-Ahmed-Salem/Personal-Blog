@@ -35,7 +35,7 @@ class Post(models.Model):
     date = models.DateField(auto_now=True)
     content = models.TextField(validators= [MinLengthValidator(10)])
     slug = models.SlugField(unique=True, db_index=True)
-    links = models.ManyToManyField(Link,null=True,blank=True,related_name='links') 
+    links = models.ManyToManyField(Link,blank=True,related_name='links') 
 
     def __str__(self):
         return f"{self.title}, {self.author}"
